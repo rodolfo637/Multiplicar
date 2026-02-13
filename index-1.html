@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <meta name="description" content="Practica las tablas de multiplicar de forma divertida. Juego educativo interactivo para aprender matemáticas.">
+    <meta name="keywords" content="tablas de multiplicar, matemáticas, educación, juego educativo">
+    <meta name="author" content="PROFE RODOLFO FERRERO">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Aventura Matemática 2.0 | Tablas de Multiplicar">
+    <meta property="og:description" content="Practica las tablas de multiplicar de forma divertida">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Aventura Matemática 2.0">
+    
+    <title>Aventura Matemática 2.0 | PROFE RODOLFO FERRERO</title>
+    
+    <!-- Google Fonts & Confetti library -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <style>
+        /* ===== VARIABLES Y RESET ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #0066cc;
+            --primary-light: #4791db;
+            --secondary: #ff8c42;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --warning: #ffb300;
+            --background: #e9f2fa;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #5f5f5f;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 20px;
+            --transition: all 0.2s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* ===== CABECERA PERSONALIZADA ===== */
+        header {
+            width: 100%;
+            background: linear-gradient(135deg, #004b87, #0066cc);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow-md);
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 1;
+            margin: 0;
+            color: #ffd966;
+            letter-spacing: 1px;
+        }
+
+        .brand h1 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .sound-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+
+        .sound-toggle:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* ===== CONTENEDOR PRINCIPAL ===== */
+        #app-container {
+            width: 95%;
+            max-width: 750px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 2rem 1.8rem;
+            margin: 2rem auto;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            transition: var(--transition);
+        }
+
+        /* ===== PANTALLA DE MENÚ ===== */
+        h2 {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.6rem;
+        }
+
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-table {
+            background: white;
+            border: 2px solid var(--primary-light);
+            color: var(--primary);
+            padding: 1rem 0.5rem;
+            border-radius: 16px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .btn-table .table-multiplier {
+            font-size: 2.8rem;
+            line-height: 1;
+            font-weight: 900;
+            display: block;
+        }
+
+        .btn-table .mix-icon {
+            font-size: 2.5rem;
+            display: block;
+            line-height: 1;
+        }
+
+        .btn-table .mix-text {
+            font-size: 1rem;
+            display: block;
+            margin-top: 0.3rem;
+            font-weight: 600;
+        }
+
+        .btn-table:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-table .record-badge {
+            font-size: 0.75rem;
+            background: var(--warning);
+            color: #000;
+            border-radius: 50px;
+            padding: 0.2rem 0.7rem;
+            margin-top: 8px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .btn-challenge {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-challenge:hover {
+            background: #e67e22;
+        }
+
+        /* ===== PANTALLA DE JUEGO ===== */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .score-box, .level-box, .question-counter {
+            background: var(--background);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: #e0e0e0;
+            height: 12px;
+            border-radius: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #4caf50);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 20px;
+        }
+
+        .question-box {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 15px 0;
+            text-align: center;
+            background: #f5fbff;
+            padding: 0.8rem;
+            border-radius: 30px;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.05);
+            word-break: break-word;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .btn-option {
+            background: white;
+            border: 3px solid var(--primary-light);
+            color: var(--primary);
+            padding: 1.5rem 1rem;
+            border-radius: 16px;
+            font-size: 2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-option:hover:not(:disabled) {
+            background: var(--primary-light);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-option:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .btn-option.correct {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+            animation: pulse 0.5s ease;
+        }
+
+        .btn-option.wrong {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .back-btn {
+            background: var(--text-light);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: var(--text);
+        }
+
+        /* ===== PANTALLA DE RESULTADO ===== */
+        .result-box {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .result-medal {
+            font-size: 5rem;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .final-score {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .stars {
+            font-size: 2.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .final-message {
+            font-size: 1.5rem;
+            color: var(--success);
+            margin: 1rem 0;
+        }
+
+        .record-info {
+            background: var(--warning);
+            color: #000;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 1.5rem auto;
+            display: inline-block;
+        }
+
+        .btn-result {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-result:hover {
+            background: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-result.secondary {
+            background: var(--text-light);
+        }
+
+        .btn-result.secondary:hover {
+            background: var(--text);
+        }
+
+        /* ===== UTILIDADES ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            header {
+                padding: 1rem;
+                text-align: center;
+            }
+
+            .brand h1 {
+                font-size: 1.3rem;
+            }
+
+            .brand p {
+                font-size: 0.8rem;
+            }
+
+            #app-container {
+                padding: 1.5rem 1rem;
+                margin: 1rem auto;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .question-box {
+                font-size: 2.5rem;
+                padding: 0.6rem;
+            }
+
+            .btn-option {
+                font-size: 1.5rem;
+                padding: 1.2rem 0.8rem;
+            }
+
+            .grid-menu {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+                gap: 12px;
+            }
+
+            .btn-table .table-multiplier {
+                font-size: 2.2rem;
+            }
+
+            .btn-table .mix-icon {
+                font-size: 2rem;
+            }
+
+            .btn-table .mix-text {
+                font-size: 0.9rem;
+            }
+
+            .result-medal {
+                font-size: 3.5rem;
+            }
+
+            .final-score {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="brand">
+            <p>PROFE RODOLFO FERRERO</p>
+            <h1>Aventura Matemática 2.0</h1>
+        </div>
+        <button class="sound-toggle" id="sound-toggle" aria-label="Control de sonido">🔊</button>
+    </header>
+
+    <!-- ===== CONTENEDOR PRINCIPAL ===== -->
+    <div id="app-container">
+        <!-- MENÚ -->
+        <div id="menu-screen">
+            <h2>📚 Elige tu Tabla</h2>
+            <div class="grid-menu" id="table-buttons"></div>
+        </div>
+
+        <!-- JUEGO -->
+        <div id="game-screen" class="hidden">
+            <div class="game-header">
+                <div class="level-box" id="level-display">📚 Tabla: -</div>
+                <div class="score-box" id="score-display">⭐ 0</div>
+                <button class="back-btn" id="back-to-menu">↩ Menú</button>
+            </div>
+            <div class="question-counter" id="question-counter">📌 0/10</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="question-box" id="question"></div>
+            <div class="options-grid" id="options"></div>
+        </div>
+
+        <!-- RESULTADO -->
+        <div id="result-screen" class="hidden">
+            <div class="result-box">
+                <div class="result-medal" id="result-medal">🏆</div>
+                <div class="final-score" id="final-score-text">0/10</div>
+                <div class="stars" id="stars-display"></div>
+                <div class="final-message" id="final-message"></div>
+                <div class="record-info hidden" id="record-info"></div>
+                <div style="margin-top: 2rem;">
+                    <button class="btn-result" id="play-again">🔄 Jugar de Nuevo</button>
+                    <button class="btn-result secondary" id="menu-from-result">📚 Menú</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    (function() {
+        'use strict';
+
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        const STORAGE_KEY = 'aventuraRecords';
+        const TOTAL_QUESTIONS = 10;
+
+        let records = loadRecords();
+        let currentTable = null;
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let soundEnabled = localStorage.getItem('aventuraSound') !== 'off';
+
+        // ============================================
+        // ELEMENTOS DEL DOM
+        // ============================================
+        const menuScreen = document.getElementById('menu-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const tableButtonsContainer = document.getElementById('table-buttons');
+        
+        const levelDisplay = document.getElementById('level-display');
+        const scoreEl = document.getElementById('score-display');
+        const questionCounter = document.getElementById('question-counter');
+        const progressEl = document.getElementById('progress-bar');
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        
+        const backToMenuBtn = document.getElementById('back-to-menu');
+        const playAgainBtn = document.getElementById('play-again');
+        const menuFromResultBtn = document.getElementById('menu-from-result');
+        const soundToggle = document.getElementById('sound-toggle');
+
+        // ============================================
+        // INICIALIZAR MENÚ
+        // ============================================
+        function initMenu() {
+            menuScreen.classList.remove('hidden');
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            renderTableButtons();
+            updateSoundButton();
+        }
+
+        function renderTableButtons() {
+            tableButtonsContainer.innerHTML = '';
+            
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'btn-table';
+                btn.innerHTML = `<span class="table-multiplier">x ${i}</span>`;
+                
+                const rec = records[i] || 0;
+                if (rec > 0) {
+                    const badge = document.createElement('div');
+                    badge.className = 'record-badge';
+                    badge.innerText = `${rec}/${TOTAL_QUESTIONS}`;
+                    btn.appendChild(badge);
+                }
+
+                btn.addEventListener('click', () => startGame(i));
+                tableButtonsContainer.appendChild(btn);
+            }
+
+            const mixBtn = document.createElement('button');
+            mixBtn.className = 'btn-table btn-challenge';
+            mixBtn.innerHTML = `<span class="mix-icon">🎲</span><span class="mix-text">Mixto</span>`;
+            
+            const mixRec = records['mix'] || 0;
+            if (mixRec > 0) {
+                const badge = document.createElement('div');
+                badge.className = 'record-badge';
+                badge.innerText = `${mixRec}/${TOTAL_QUESTIONS}`;
+                mixBtn.appendChild(badge);
+            }
+
+            mixBtn.addEventListener('click', () => startGame('mix'));
+            tableButtonsContainer.appendChild(mixBtn);
+        }
+
+        // ============================================
+        // INICIAR JUEGO
+        // ============================================
+        function startGame(table) {
+            currentTable = table;
+            questions = generateQuestions(table);
+            currentIndex = 0;
+            score = 0;
+
+            menuScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+
+            const label = table === 'mix' ? '🎲 Mixto' : `Tabla del ${table}`;
+            levelDisplay.innerText = `📚 ${label}`;
+            
+            updateUI();
+            showQuestion();
+        }
+
+        function generateQuestions(table) {
+            let qArray = [];
+            if (table === 'mix') {
+                for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                    qArray.push({
+                        a: Math.floor(Math.random() * 12) + 1,
+                        b: Math.floor(Math.random() * 12) + 1
+                    });
+                }
+            } else {
+                let numbers = [1,2,3,4,5,6,7,8,9,10];
+                numbers = shuffleArray(numbers);
+                numbers.forEach(num => {
+                    qArray.push({ a: table, b: num });
+                });
+            }
+            return qArray;
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // ============================================
+        // MOSTRAR PREGUNTA (con x minúscula)
+        // ============================================
+        function showQuestion() {
+            const q = questions[currentIndex];
+            const correctAnswer = q.a * q.b;
+            questionEl.innerText = `${q.a} x ${q.b} = ?`;
+
+            let options = new Set();
+            options.add(correctAnswer);
+            
+            while (options.size < 4) {
+                const offset = Math.floor(Math.random() * 5) + 1;
+                const variant = Math.random() < 0.5 ? correctAnswer + offset : correctAnswer - offset;
+                if (variant > 0 && variant <= 100 && variant !== correctAnswer) {
+                    options.add(variant);
+                } else {
+                    const fakeA = Math.floor(Math.random() * 12) + 1;
+                    const fakeB = Math.floor(Math.random() * 12) + 1;
+                    options.add(fakeA * fakeB);
+                }
+            }
+
+            let optionsArray = Array.from(options);
+            optionsArray = shuffleArray(optionsArray);
+
+            optionsEl.innerHTML = '';
+            optionsArray.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerText = opt;
+                btn.setAttribute('aria-label', `Opción ${opt}`);
+                btn.onclick = (e) => checkAnswer(opt, correctAnswer, btn);
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        // ============================================
+        // VERIFICAR RESPUESTA
+        // ============================================
+        function checkAnswer(selected, correct, btnElement) {
+            const allBtns = document.querySelectorAll('.btn-option');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selected === correct) {
+                btnElement.classList.add('correct');
+                score++;
+                updateUI();
+                playSound('correct');
+                if (soundEnabled) confetti({particleCount: 15, spread: 30, origin: {y: 0.6}});
+                setTimeout(nextQuestion, 700);
+            } else {
+                btnElement.classList.add('wrong');
+                playSound('wrong');
+                allBtns.forEach(b => {
+                    if (parseInt(b.innerText) === correct) {
+                        b.classList.add('correct');
+                    }
+                });
+                setTimeout(nextQuestion, 1200);
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < TOTAL_QUESTIONS) {
+                showQuestion();
+                updateUI();
+            } else {
+                endGame();
+            }
+        }
+
+        function updateUI() {
+            scoreEl.innerText = `⭐ ${score}`;
+            const pct = (currentIndex / TOTAL_QUESTIONS) * 100;
+            progressEl.style.width = `${pct}%`;
+            questionCounter.innerText = `📌 ${currentIndex}/${TOTAL_QUESTIONS}`;
+        }
+
+        // ============================================
+        // FIN DEL JUEGO Y RÉCORDS
+        // ============================================
+        function endGame() {
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const finalScoreEl = document.getElementById('final-score-text');
+            const starsDisplay = document.getElementById('stars-display');
+            const msg = document.getElementById('final-message');
+            const medalIcon = document.getElementById('result-medal');
+            const recordInfo = document.getElementById('record-info');
+
+            finalScoreEl.innerText = `${score}/${TOTAL_QUESTIONS}`;
+            
+            let stars = '';
+            let medal = '🏆';
+            if (score === TOTAL_QUESTIONS) {
+                stars = '⭐⭐⭐';
+                msg.innerText = '¡PERFECTO!';
+                medal = '🏆🏆🏆';
+                launchFullConfetti();
+            } else if (score >= 7) {
+                stars = '⭐⭐';
+                msg.innerText = '¡Muy bien hecho!';
+                medal = '🏆🏆';
+            } else {
+                stars = '⭐';
+                msg.innerText = '¡Sigue practicando!';
+                medal = '🏆';
+            }
+            starsDisplay.innerText = stars;
+            medalIcon.innerText = medal;
+
+            const key = currentTable === 'mix' ? 'mix' : currentTable;
+            const oldRecord = records[key] || 0;
+            if (score > oldRecord) {
+                records[key] = score;
+                saveRecords();
+                recordInfo.classList.remove('hidden');
+                recordInfo.innerHTML = `🎉 ¡NUEVO RÉCORD! Superaste tu mejor puntaje (${oldRecord}/${TOTAL_QUESTIONS}).`;
+                if (soundEnabled) confetti({particleCount: 100, spread: 70, origin: {y: 0.5}});
+            } else {
+                recordInfo.classList.add('hidden');
+            }
+
+            renderTableButtons();
+        }
+
+        function loadRecords() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                return stored ? JSON.parse(stored) : {};
+            } catch (e) {
+                console.warn('Error loading records:', e);
+                return {};
+            }
+        }
+
+        function saveRecords() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            } catch (e) {
+                console.warn('Error saving records:', e);
+            }
+        }
+
+        // ============================================
+        // SONIDOS (Web Audio API)
+        // ============================================
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                if (type === 'correct') {
+                    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                } else {
+                    oscillator.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.2);
+                }
+            } catch (e) {
+                console.warn('Audio no soportado:', e);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            try {
+                localStorage.setItem('aventuraSound', soundEnabled ? 'on' : 'off');
+            } catch (e) {
+                console.warn('Error saving sound preference:', e);
+            }
+            updateSoundButton();
+        }
+
+        function updateSoundButton() {
+            soundToggle.innerText = soundEnabled ? '🔊' : '🔇';
+        }
+
+        // ============================================
+        // CONFETI MEJORADO
+        // ============================================
+        function launchFullConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({particleCount: 150, spread: 60, origin: {y: 0.6}});
+                confetti({particleCount: 100, spread: 100, origin: {y: 0.5, x: 0.2}});
+                confetti({particleCount: 100, spread: 100, origin: {y: 0.5, x: 0.8}});
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS ADICIONALES
+        // ============================================
+        backToMenuBtn.addEventListener('click', function(e) {
+            if (confirm('¿Volver al menú? Se perderá el progreso actual.')) {
+                initMenu();
+            }
+        });
+
+        playAgainBtn.addEventListener('click', function() {
+            startGame(currentTable);
+        });
+
+        menuFromResultBtn.addEventListener('click', function() {
+            initMenu();
+        });
+
+        soundToggle.addEventListener('click', toggleSound);
+
+        // ============================================
+        // INICIAR APLICACIÓN
+        // ============================================
+        initMenu();
+    })();
+</script>
+</body>
+</html>
